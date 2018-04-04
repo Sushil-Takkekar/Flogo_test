@@ -1,0 +1,23 @@
+{
+  "name": "HelloWorld",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "author": "Sushil",
+  "inputs":[
+    {
+      "name": "Your_Name",
+      "type": "string"
+    },
+	{
+      "name": "Your_Age",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "string"
+    }
+  ]
+}

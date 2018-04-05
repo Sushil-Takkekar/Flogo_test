@@ -2,6 +2,7 @@
   "name": "HelloWorld",
   "version": "0.0.1",
   "type": "flogo:activity",
+  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/HelloWorld",
   "description": "activity description",
   "author": "Sushil",
   "inputs":[

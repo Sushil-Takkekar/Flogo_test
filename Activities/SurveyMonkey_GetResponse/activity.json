@@ -2,7 +2,7 @@
   "name": "SurveyMonkey_GetResponse",
   "version": "0.0.1",
   "type": "flogo:activity",
-  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/HelloWorld",
+  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/SurveyMonkey_GetResponse",
   "description": "activity description",
   "author": "Team Dummies",
   "inputs":[

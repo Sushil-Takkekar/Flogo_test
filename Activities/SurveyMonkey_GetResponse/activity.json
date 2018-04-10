@@ -1,0 +1,24 @@
+{
+  "name": "SurveyMonkey_GetResponse",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/HelloWorld",
+  "description": "activity description",
+  "author": "Team Dummies",
+  "inputs":[
+    {
+      "name": "Access_Token",
+      "type": "string"
+    },
+	{
+      "name": "Survey_Name",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Response_Json",
+      "type": "string"
+    }
+  ]
+}

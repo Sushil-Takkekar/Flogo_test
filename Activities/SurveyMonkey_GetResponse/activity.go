@@ -32,7 +32,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 	fmt.Println("Starting the application...")
 		//accessToken := "z8UFEI9i5ua1WWhI40S1xo8yLlFJFsOPMdwtsB83YYAJy.1fr.zPLQ9mfrh7a2qTZHqdCwwnMHHn9.U0OvXcyx5SjYLRjcMUsE-YE6mcZAB0fg4lP2zoDNg-sL8fxDoQ"
 		//surveyName := "FLG_2_QA_Variety"
-		
+
 		accessToken := context.GetInput("Access_Token").(string)
 		surveyName := context.GetInput("Survey_Name").(string)
 		
@@ -49,7 +49,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		surveyID := ""
 		if err_surveyID != nil {
 			//set return
-			result_return = "The HTTP request for getting SurveyID failed with error "+err_surveyID.Error()+"\n"
+			result_return = `{ "Error" : { "message" : "The HTTP request for getting SurveyID failed with error `+err_surveyID.Error()+`" } }`
 			context.SetOutput("Response_Json", result_return)
 			return true, nil
 		} else {
@@ -60,17 +60,17 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 			errorCode := gjson.Get(string(res_surveyID), "error.http_status_code").String()
 			if errorCode=="401" {
 				//set return
-				result_return = "Error= " + gjson.Get(string(res_surveyID), "error.message").String()
+				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(res_surveyID), "error.message").String() +`"} }`
 				context.SetOutput("Response_Json", result_return)
 				return true, nil
 			} else if errorCode=="404" {
 				//set return
-				result_return = "Error1= " + gjson.Get(string(res_surveyID), "error.message").String()
+				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(res_surveyID), "error.message").String() +`"} }`
 				context.SetOutput("Response_Json", result_return)
 				return true, nil
 			}	else if invalidSurveyName=="0" {
 				//set return
-				result_return = "Error= Invalid Survey name !!"
+				result_return = `{ "Error" : { "message" : "Invalid Survey name !!" } }`
 				context.SetOutput("Response_Json", result_return)
 				return true, nil
 			} else {
@@ -87,7 +87,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		res_surveyDetails, err_surveyDetails := client.Do(request)
 		if err_surveyDetails != nil {
 			//set return
-			result_return = "The HTTP request for getting SurveyDetails failed with error" + err_surveyDetails.Error() + "\n"
+			result_return = `{ "Error" : { "message" : "The HTTP request for getting SurveyID failed with error `+err_surveyDetails.Error()+`" } }`
 			context.SetOutput("Response_Json", result_return)
 			return true, nil
 		} else {
@@ -96,7 +96,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 			errorCode := gjson.Get(string(surveyDetails), "error.http_status_code").String()
 			if errorCode=="404" {
 				//set return
-				result_return = "Error2= "+ gjson.Get(string(surveyDetails), "error.message").String()
+				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(surveyDetails), "error.message").String() +`"} }`
 				context.SetOutput("Response_Json", result_return)
 				return true, nil
 			}
@@ -112,7 +112,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		res_surveyResponse, err_surveyResponse := client.Do(request)
 		if err_surveyResponse != nil {
 			//set return
-			result_return = "The HTTP request for getting SurveyDetails failed with error "+ err_surveyResponse.Error() + "\n"
+			result_return = `{ "Error" : { "message" : "The HTTP request for getting SurveyID failed with error `+err_surveyResponse.Error()+`" } }`
 			context.SetOutput("Response_Json", result_return)
 			return true, nil
 		} else {
@@ -121,7 +121,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 			errorCode := gjson.Get(string(surveyResponse), "error.http_status_code").String()
 			if errorCode=="404" {
 				//set return
-				result_return = "Error3= "+ gjson.Get(string(surveyResponse), "error.message").String()
+				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(surveyResponse), "error.message").String() +`"} }`
 				context.SetOutput("Response_Json", result_return)
 				return true, nil
 			}

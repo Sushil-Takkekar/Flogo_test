@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) string {
+func SetSurveyDetails(jsonstr string, jsonSR string, activityOutput string) string {
 		//set metadata
 		questions := gjson.Get(jsonstr, "surveydetails.pages.0.questions")
 		for _, que := range questions.Array() {

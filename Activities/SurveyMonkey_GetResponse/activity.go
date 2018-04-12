@@ -134,7 +134,7 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 			//fmt.Println("que= ",que.String())
 			//queIndex := "survey.questions."+gjson.Get(que.String(), "survey.questions.#").String()+".title"
 			queIndex := gjson.Get(activityOutput, "survey.questions.#").String()
-			//fmt.Println("queIndex= "+queIndex)
+			fmt.Println("queIndex= "+queIndex)
 			//set heading
 			activityOutput_tmp, _ := sjson.Set(activityOutput, "survey.questions."+queIndex+".title", gjson.Get(que.String(), "headings.0.heading").String())
 			//set question id
@@ -155,6 +155,8 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows.0.id", "")
 			rows := gjson.Get(que.String(), "answers.rows")
 			for r, row := range rows.Array() {
+				// tmp := strings.Join([]string{"survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible"},"")
+				// tmp := "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible"
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible", gjson.Get(row.String(), "visible").String())
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".text", gjson.Get(row.String(), "text").String())
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".position", gjson.Get(row.String(), "position").String())
@@ -195,9 +197,10 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".choice_id", gjson.Get(ans.String(), "choice_id").String())
 								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".row_id", gjson.Get(ans.String(), "row_id").String())
 								//set answer title from surveydetails
-								if gjson.Get(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(rs)+".text").String()=="" {
-									activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(rs)+".text", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
-								}
+								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".title", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
+								// if gjson.Get(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".text").String()=="" {
+								// 	activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".text", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
+								// }
 								//fmt.Println("------------>",gjson.Get(ans.String(), "choice_id").String())
 						}
 			}
@@ -207,6 +210,6 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 		}//end of outer loop
 		// v1, _ := sjson.Set(activityOutput, "survey.questions.0.title", gjson.Get(jsonstr, "surveydetails.pages.0.questions.0.headings.0.heading").String())
 		// fmt.Println("Output= ",v2)
-		//fmt.Println("activityOutput= ",activityOutput)
+		fmt.Println("activityOutput= ",activityOutput)
 		return activityOutput
 }

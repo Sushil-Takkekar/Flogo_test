@@ -133,7 +133,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		//fmt.Println(jsonSR)
 /*-----------------------------------------------------------------------------------------------------------*/
 
-		activityOutput = setSurveyDetails(jsonstr, jsonSR, activityOutput)
+		activityOutput = surveyMonkeyCode.SetSurveyDetails(jsonstr, jsonSR, activityOutput)
 		context.SetOutput("Response_Json", activityOutput)
 		
 	return true, nil

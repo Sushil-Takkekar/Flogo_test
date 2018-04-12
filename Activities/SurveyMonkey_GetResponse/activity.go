@@ -30,9 +30,12 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 
 	// do eval
 	fmt.Println("Starting the application...")
-		accessToken := "z8UFEI9i5ua1WWhI40S1xo8yLlFJFsOPMdwtsB83YYAJy.1fr.zPLQ9mfrh7a2qTZHqdCwwnMHHn9.U0OvXcyx5SjYLRjcMUsE-YE6mcZAB0fg4lP2zoDNg-sL8fxDoQ"
-		surveyName := "FLG_2_QA_Variety"
-
+		//accessToken := "z8UFEI9i5ua1WWhI40S1xo8yLlFJFsOPMdwtsB83YYAJy.1fr.zPLQ9mfrh7a2qTZHqdCwwnMHHn9.U0OvXcyx5SjYLRjcMUsE-YE6mcZAB0fg4lP2zoDNg-sL8fxDoQ"
+		//surveyName := "FLG_2_QA_Variety"
+		
+		accessToken := context.GetInput("Access_Token").(string)
+		surveyName := context.GetInput("Survey_Name").(string)
+		
 		jsonstr := ""
 		jsonSR := ""
 		activityOutput := `{ "survey" : { "questions" : [] } }`

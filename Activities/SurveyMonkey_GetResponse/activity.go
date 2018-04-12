@@ -30,15 +30,13 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 
 	// do eval
 	fmt.Println("Starting the application...")
-		//accessToken := "z8UFEI9i5ua1WWhI40S1xo8yLlFJFsOPMdwtsB83YYAJy.1fr.zPLQ9mfrh7a2qTZHqdCwwnMHHn9.U0OvXcyx5SjYLRjcMUsE-YE6mcZAB0fg4lP2zoDNg-sL8fxDoQ"
-		//surveyName := "FLG_2_QA_Variety"
+		accessToken := "z8UFEI9i5ua1WWhI40S1xo8yLlFJFsOPMdwtsB83YYAJy.1fr.zPLQ9mfrh7a2qTZHqdCwwnMHHn9.U0OvXcyx5SjYLRjcMUsE-YE6mcZAB0fg4lP2zoDNg-sL8fxDoQ"
+		surveyName := "FLG_2_QA_Variety"
 
-		accessToken := context.GetInput("Access_Token").(string)
-		surveyName := context.GetInput("Survey_Name").(string)
-		
 		jsonstr := ""
 		jsonSR := ""
-		activityOutput := `{ "survey" : { "questions" : [ { "title" : "", "id" : "", "validation" : "", "position": number, "subtype" : "", "family" : "", "type" : "", "visible" : boolean, "answers" : {"rows": [],"other": [],"choices": []}, "responses" : [] } ] } }`
+		activityOutput := `{ "survey" : { "questions" : [] } }`
+		result_return := ""
 
 		request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
 		request.Header.Set("Authorization", "bearer "+accessToken)
@@ -47,10 +45,30 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		res_surveyID, err_surveyID := client.Do(request)
 		surveyID := ""
 		if err_surveyID != nil {
-			fmt.Printf("The HTTP request for getting SurveyID failed with error %s\n", err_surveyID)
+			//set return
+			result_return = "The HTTP request for getting SurveyID failed with error "+err_surveyID.Error()+"\n"
+			context.SetOutput("Response_Json", result_return)
 		} else {
 			res_surveyID, _ := ioutil.ReadAll(res_surveyID.Body)
-			surveyID = gjson.Get(string(res_surveyID), "data.0.id").String()
+			fmt.Println("res_surveyID= ", string(res_surveyID))
+
+			invalidSurveyName := gjson.Get(string(res_surveyID), "data.#").String()
+			errorCode := gjson.Get(string(res_surveyID), "error.http_status_code").String()
+			if errorCode=="401" {
+				//set return
+				result_return = "Error= " + gjson.Get(string(res_surveyID), "error.message").String()
+				context.SetOutput("Response_Json", result_return)
+			} else if errorCode=="404" {
+				//set return
+				result_return = "Error1= " + gjson.Get(string(res_surveyID), "error.message").String()
+				context.SetOutput("Response_Json", result_return)
+			}	else if invalidSurveyName=="0" {
+				//set return
+				result_return = "Error= Invalid Survey name !!"
+				context.SetOutput("Response_Json", result_return)
+			} else {
+				surveyID = gjson.Get(string(res_surveyID), "data.0.id").String()
+			}
 			//fmt.Println("res_surveyID", surveyID)
 		}
 
@@ -61,14 +79,21 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		client = &http.Client{}
 		res_surveyDetails, err_surveyDetails := client.Do(request)
 		if err_surveyDetails != nil {
-			fmt.Printf("The HTTP request for getting SurveyDetails failed with error %s\n", err_surveyDetails)
+			//set return
+			result_return = "The HTTP request for getting SurveyDetails failed with error" + err_surveyDetails.Error() + "\n"
+			context.SetOutput("Response_Json", result_return)
 		} else {
 			surveyDetails, _ := ioutil.ReadAll(res_surveyDetails.Body)
 			//fmt.Println(string(surveyDetails))
-			//set surveyDetails
+			errorCode := gjson.Get(string(surveyDetails), "error.http_status_code").String()
+			if errorCode=="404" {
+				//set return
+				result_return = "Error2= "+ gjson.Get(string(surveyDetails), "error.message").String()
+				context.SetOutput("Response_Json", result_return)
+			}
+			//set surveyDetails parent element
 			jsonstr = 	`{ "surveydetails" : `+string(surveyDetails)+`}`
 		}
-		//jsonSR = `{ "surveyresponses" : `+string(jsonIPSR)+`}`
 
 		link_surveyResponse := "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/responses/bulk"
 		request, _ = http.NewRequest("GET", link_surveyResponse, nil)
@@ -77,10 +102,18 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		client = &http.Client{}
 		res_surveyResponse, err_surveyResponse := client.Do(request)
 		if err_surveyResponse != nil {
-			fmt.Printf("The HTTP request for getting SurveyDetails failed with error %s\n", err_surveyResponse)
+			//set return
+			result_return = "The HTTP request for getting SurveyDetails failed with error "+ err_surveyResponse.Error() + "\n"
+			context.SetOutput("Response_Json", result_return)
 		} else {
 			surveyResponse, _ := ioutil.ReadAll(res_surveyResponse.Body)
 			//fmt.Println(string(surveyResponse))
+			errorCode := gjson.Get(string(surveyResponse), "error.http_status_code").String()
+			if errorCode=="404" {
+				//set return
+				result_return = "Error3= "+ gjson.Get(string(surveyResponse), "error.message").String()
+				context.SetOutput("Response_Json", result_return)
+			}
 			//set surveyresponses
 			jsonSR = `{ "surveyresponses" : `+string(surveyResponse)+`}`
 		}
@@ -122,8 +155,6 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows.0.id", "")
 			rows := gjson.Get(que.String(), "answers.rows")
 			for r, row := range rows.Array() {
-				// tmp := strings.Join([]string{"survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible"},"")
-				// tmp := "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible"
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible", gjson.Get(row.String(), "visible").String())
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".text", gjson.Get(row.String(), "text").String())
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".position", gjson.Get(row.String(), "position").String())
@@ -164,7 +195,9 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".choice_id", gjson.Get(ans.String(), "choice_id").String())
 								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".row_id", gjson.Get(ans.String(), "row_id").String())
 								//set answer title from surveydetails
-								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".title", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
+								if gjson.Get(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(rs)+".text").String()=="" {
+									activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(rs)+".text", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
+								}
 								//fmt.Println("------------>",gjson.Get(ans.String(), "choice_id").String())
 						}
 			}

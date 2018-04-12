@@ -48,6 +48,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 			//set return
 			result_return = "The HTTP request for getting SurveyID failed with error "+err_surveyID.Error()+"\n"
 			context.SetOutput("Response_Json", result_return)
+			return true, nil
 		} else {
 			res_surveyID, _ := ioutil.ReadAll(res_surveyID.Body)
 			fmt.Println("res_surveyID= ", string(res_surveyID))
@@ -58,14 +59,17 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 				//set return
 				result_return = "Error= " + gjson.Get(string(res_surveyID), "error.message").String()
 				context.SetOutput("Response_Json", result_return)
+				return true, nil
 			} else if errorCode=="404" {
 				//set return
 				result_return = "Error1= " + gjson.Get(string(res_surveyID), "error.message").String()
 				context.SetOutput("Response_Json", result_return)
+				return true, nil
 			}	else if invalidSurveyName=="0" {
 				//set return
 				result_return = "Error= Invalid Survey name !!"
 				context.SetOutput("Response_Json", result_return)
+				return true, nil
 			} else {
 				surveyID = gjson.Get(string(res_surveyID), "data.0.id").String()
 			}
@@ -82,6 +86,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 			//set return
 			result_return = "The HTTP request for getting SurveyDetails failed with error" + err_surveyDetails.Error() + "\n"
 			context.SetOutput("Response_Json", result_return)
+			return true, nil
 		} else {
 			surveyDetails, _ := ioutil.ReadAll(res_surveyDetails.Body)
 			//fmt.Println(string(surveyDetails))
@@ -90,6 +95,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 				//set return
 				result_return = "Error2= "+ gjson.Get(string(surveyDetails), "error.message").String()
 				context.SetOutput("Response_Json", result_return)
+				return true, nil
 			}
 			//set surveyDetails parent element
 			jsonstr = 	`{ "surveydetails" : `+string(surveyDetails)+`}`
@@ -105,6 +111,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 			//set return
 			result_return = "The HTTP request for getting SurveyDetails failed with error "+ err_surveyResponse.Error() + "\n"
 			context.SetOutput("Response_Json", result_return)
+			return true, nil
 		} else {
 			surveyResponse, _ := ioutil.ReadAll(res_surveyResponse.Body)
 			//fmt.Println(string(surveyResponse))
@@ -113,6 +120,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 				//set return
 				result_return = "Error3= "+ gjson.Get(string(surveyResponse), "error.message").String()
 				context.SetOutput("Response_Json", result_return)
+				return true, nil
 			}
 			//set surveyresponses
 			jsonSR = `{ "surveyresponses" : `+string(surveyResponse)+`}`
@@ -137,19 +145,12 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 			fmt.Println("queIndex= "+queIndex)
 			//set heading
 			activityOutput_tmp, _ := sjson.Set(activityOutput, "survey.questions."+queIndex+".title", gjson.Get(que.String(), "headings.0.heading").String())
-			//set question id
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".id", gjson.Get(que.String(), "id").String())
-			//set
-			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".validation", gjson.Get(que.String(), "validation").String())
-			//set
+			//activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".validation", gjson.Get(que.String(), "validation").String())
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".position", gjson.Get(que.String(), "position").String())
-			//set
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".subtype", gjson.Get(que.String(), "subtype").String())
-			//set
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".family", gjson.Get(que.String(), "family").String())
-			//set
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".type", gjson.Get(que.String(), "required.type").String())
-			//set
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".visible", gjson.Get(que.String(), "visible").String())
 			//set answers-rows
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows.0.id", "")
@@ -198,9 +199,6 @@ func setSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".row_id", gjson.Get(ans.String(), "row_id").String())
 								//set answer title from surveydetails
 								activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".title", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
-								// if gjson.Get(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".text").String()=="" {
-								// 	activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".text", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
-								// }
 								//fmt.Println("------------>",gjson.Get(ans.String(), "choice_id").String())
 						}
 			}

@@ -12,13 +12,12 @@ func SetSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 		questions := gjson.Get(jsonstr, "surveydetails.pages.0.questions")
 		for _, que := range questions.Array() {
 			//fmt.Println("que= ",que.String())
-			//queIndex := "survey.questions."+gjson.Get(que.String(), "survey.questions.#").String()+".title"
 			queIndex := gjson.Get(activityOutput, "survey.questions.#").String()
 			fmt.Println("queIndex= "+queIndex)
 			//set heading
 			activityOutput_tmp, _ := sjson.Set(activityOutput, "survey.questions."+queIndex+".title", gjson.Get(que.String(), "headings.0.heading").String())
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".id", gjson.Get(que.String(), "id").String())
-			//activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".validation", gjson.Get(que.String(), "validation").String())
+			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".validation", gjson.Get(que.String(), "validation").String())
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".position", gjson.Get(que.String(), "position").String())
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".subtype", gjson.Get(que.String(), "subtype").String())
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".family", gjson.Get(que.String(), "family").String())
@@ -28,8 +27,6 @@ func SetSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows.0.id", "")
 			rows := gjson.Get(que.String(), "answers.rows")
 			for r, row := range rows.Array() {
-				// tmp := strings.Join([]string{"survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible"},"")
-				// tmp := "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible"
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".visible", gjson.Get(row.String(), "visible").String())
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".text", gjson.Get(row.String(), "text").String())
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".position", gjson.Get(row.String(), "position").String())
@@ -57,7 +54,7 @@ func SetSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.choices."+strconv.Itoa(c)+".description", gjson.Get(ch.String(), "description").String())
 					activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".answers.choices."+strconv.Itoa(c)+".id", gjson.Get(ch.String(), "id").String())
 			}
-		////////////////////////////////////////////////////////////////////////////
+			/*************************************************************************************/
 			activityOutput_tmp, _ = sjson.Set(activityOutput_tmp, "survey.questions."+queIndex+".responses.0.id", "")
 			responses := gjson.Get(jsonSR, "surveyresponses.data")
 			for rs, res := range responses.Array() {
@@ -74,12 +71,10 @@ func SetSurveyDetails(jsonstr string, jsonSR string, activityOutput string) stri
 								//fmt.Println("------------>",gjson.Get(ans.String(), "choice_id").String())
 						}
 			}
-		////////////////////////////////////////////////////////////////////////////
+			/*************************************************************************************/
 			//Update actual output var
 			activityOutput = activityOutput_tmp
 		}//end of outer loop
-		// v1, _ := sjson.Set(activityOutput, "survey.questions.0.title", gjson.Get(jsonstr, "surveydetails.pages.0.questions.0.headings.0.heading").String())
-		// fmt.Println("Output= ",v2)
 		fmt.Println("activityOutput= ",activityOutput)
 		return activityOutput
 }

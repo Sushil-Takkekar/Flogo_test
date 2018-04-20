@@ -2,13 +2,46 @@
 
 This activity allows you to get the responses for your survey.
 
+## Installation
+
+### Flogo CLI
+
+```
+flogo install github.com/Sushil-Takkekar/Flogo_test/Activities/SurveyMonkey_GetResponse
+```
+
+### Schema
+
+```
+{
+ "inputs":[
+    {
+      "name": "Access_Token",
+      "required": true,
+      "type": "string"
+    },
+	{
+      "name": "Survey_Name",
+      "required": true,
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Response_Json",
+      "type": "string"
+    }
+  ]
+}
+```
+
 ### Activity Input
 
 
 | Name | Required | Type | Description |
 | ---- | -------- | ---- |------------ |
-| Access_Token | Yes | String | Access Token of your surveymonkey App |
-| Survey_Name  | Yes | String | Name of the survey |
+| Access_Token | True | String | Access Token of your surveymonkey App |
+| Survey_Name  | True | String | Name of the survey |
 
 
 ### Activity Output
@@ -91,13 +124,13 @@ This activity will give the response in a following way,
                     {
                         "answers": [
                             {
-                                "choice_id": "1969874111",
+                                "choice_id": "1969875809",
                                 "row_id": "",
                                 "text": "",
-                                "title": "Male"
+                                "title": "Female"
                             }
                         ],
-                        "id": "6807750266"
+                        "id": "6807764827"
                     }
                 ],
                 "subtype": "vertical",

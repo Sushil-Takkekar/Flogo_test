@@ -1,6 +1,6 @@
-# SurveyMonkey GetResponse
+# SurveyMonkey_GetResponse
 
-This activity allows you to get the responses for your survey.
+This activity allows you to get the responses for your survey in a json format. It takes survey name and access token as an input and gives all the responses for that survey in a compact json format, which can be used to represent the stats graphically.
 
 ## Installation
 
@@ -10,7 +10,7 @@ This activity allows you to get the responses for your survey.
 flogo install github.com/Sushil-Takkekar/Flogo_test/Activities/SurveyMonkey_GetResponse
 ```
 
-### Third-party libraries used :
+### Third-party libraries used 
 - #### GJSON : 
 	GJSON is a Go package that provides a fast and simple way to get values from a json document. It has features such as one line retrieval, dot notation paths, iteration, and parsing json lines.
 - #### SJSON : 

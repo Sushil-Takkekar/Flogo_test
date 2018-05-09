@@ -43,7 +43,6 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 		jsonstr := ""
 		jsonSR := ""
 		activityOutput := `{ "survey" : { "questions" : [] } }`
-		result_return := ""
 		err_return := ""
 
 		request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)

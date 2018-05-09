@@ -45,6 +45,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 	jsonSR := ""
 	activityOutput := `{ "survey" : { "questions" : [] } }`
 	errReturn := ""
+	errorCode := ""
 
 	request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
 	request.Header.Set("Authorization", "bearer "+accessToken)
@@ -58,11 +59,11 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 		activityLog.Errorf(errReturn)
 		return false, errors.New(errReturn)
 	}
-	resSurveyID, _ := ioutil.ReadAll(resSurveyID.Body)
+	resSurveyID, _ = ioutil.ReadAll(resSurveyID.Body)
 	//fmt.Println("resSurveyID= ", string(resSurveyID))
 
 	invalidSurveyName := gjson.Get(string(resSurveyID), "data.#").String()
-	errorCode := gjson.Get(string(resSurveyID), "error.http_status_code").String()
+	errorCode = gjson.Get(string(resSurveyID), "error.http_status_code").String()
 	if errorCode == "401" {
 		//set return
 		errReturn = gjson.Get(string(resSurveyID), "error.message").String()
@@ -97,7 +98,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 	}
 	surveyDetails, _ := ioutil.ReadAll(resSurveyDetails.Body)
 	//fmt.Println(string(surveyDetails))
-	errorCode := gjson.Get(string(surveyDetails), "error.http_status_code").String()
+	errorCode = gjson.Get(string(surveyDetails), "error.http_status_code").String()
 	if errorCode == "404" {
 		//set return
 		errReturn = gjson.Get(string(surveyDetails), "error.message").String()
@@ -121,7 +122,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 	}
 	surveyResponse, _ := ioutil.ReadAll(resSurveyResponse.Body)
 	//fmt.Println(string(surveyResponse))
-	errorCode := gjson.Get(string(surveyResponse), "error.http_status_code").String()
+	errorCode = gjson.Get(string(surveyResponse), "error.http_status_code").String()
 	if errorCode == "404" {
 		//set return
 		errReturn = gjson.Get(string(surveyResponse), "error.message").String()

@@ -51,7 +51,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 	request.Header.Set("Authorization", "bearer "+accessToken)
 	request.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
-	resSurveyID, errSurveyID := client.Do(request)
+	resSurveyID_data, errSurveyID := client.Do(request)
 	surveyID := ""
 	if errSurveyID != nil {
 		//set return
@@ -59,7 +59,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 		activityLog.Errorf(errReturn)
 		return false, errors.New(errReturn)
 	}
-	resSurveyID, _ = ioutil.ReadAll(resSurveyID.Body)
+	resSurveyID, _ := ioutil.ReadAll(resSurveyID_data.Body)
 	//fmt.Println("resSurveyID= ", string(resSurveyID))
 
 	invalidSurveyName := gjson.Get(string(resSurveyID), "data.#").String()

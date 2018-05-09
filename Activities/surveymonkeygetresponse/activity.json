@@ -1,10 +1,10 @@
 {
-  "name": "SurveyMonkey_GetResponse",
+  "name": "SurveyMonkey GetResponse",
   "version": "0.0.1",
   "type": "flogo:activity",
-  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/SurveyMonkey_GetResponse",
-  "description": "activity description",
-  "author": "Team Dummies",
+  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/surveymonkeygetresponse",
+  "description": "Get the survey responses from SurveyMonkey account",
+  "author": "Team LetsFlogo",
   "inputs":[
     {
       "name": "Access_Token",

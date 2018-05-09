@@ -1,14 +1,15 @@
-package surveymonkey_getresponse
+package surveymonkeygetresponse
 
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/Sushil-Takkekar/Flogo_test/Activity_logic/surveyMonkeyCode"
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 	"github.com/tidwall/gjson"
-	"io/ioutil"
-	"net/http"
 )
 
 // ActivityLog is the default logger for the Log Activity

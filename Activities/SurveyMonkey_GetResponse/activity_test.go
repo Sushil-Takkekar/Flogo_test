@@ -1,4 +1,4 @@
-package SurveyMonkey_GetResponse
+package surveymonkey_getresponse
 
 import (
 	"io/ioutil"

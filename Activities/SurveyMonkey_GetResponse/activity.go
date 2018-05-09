@@ -5,6 +5,7 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 	"github.com/tidwall/gjson"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"

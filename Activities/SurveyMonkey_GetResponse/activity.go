@@ -3,31 +3,33 @@ package SurveyMonkey_GetResponse
 import (
 	"github.com/Sushil-Takkekar/Flogo_test/Activity_logic/surveyMonkeyCode"
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/TIBCOSoftware/flogo-lib/logger"
 	"github.com/tidwall/gjson"
-	//"github.com/tidwall/sjson"
 	"fmt"
-	//"strconv"
 	"io/ioutil"
 	"net/http"
 )
 
-// MyActivity is a stub for your Activity implementation
-type MyActivity struct {
+// ActivityLog is the default logger for the Log Activity
+var activityLog = logger.GetLogger("activity-flogo-SurveyMonkey_GetResponse")
+
+// SurveyMonkeyGetResponseActivity is a stub for your Activity implementation
+type SurveyMonkeyGetResponseActivity struct {
 	metadata *activity.Metadata
 }
 
 // NewActivity creates a new activity
 func NewActivity(metadata *activity.Metadata) activity.Activity {
-	return &MyActivity{metadata: metadata}
+	return &SurveyMonkeyGetResponseActivity{metadata: metadata}
 }
 
 // Metadata implements activity.Activity.Metadata
-func (a *MyActivity) Metadata() *activity.Metadata {
+func (a *SurveyMonkeyGetResponseActivity) Metadata() *activity.Metadata {
 	return a.metadata
 }
 
 // Eval implements activity.Activity.Eval
-func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
+func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done bool, err error)  {
 
 	// do eval
 	fmt.Println("Starting the SurveyMonkey application...")
@@ -41,6 +43,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		jsonSR := ""
 		activityOutput := `{ "survey" : { "questions" : [] } }`
 		result_return := ""
+		err_return := ""
 
 		request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
 		request.Header.Set("Authorization", "bearer "+accessToken)
@@ -50,9 +53,10 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		surveyID := ""
 		if err_surveyID != nil {
 			//set return
-			result_return = `{ "Error" : { "message" : "The HTTP request for getting SurveyID failed with error `+err_surveyID.Error()+`" } }`
-			context.SetOutput("Response_Json", result_return)
-			return true, nil
+			err_return = "The HTTP request for getting SurveyID failed with error: "+err_surveyID.Error()
+			//context.SetOutput("Response_Json", err_return)
+			activityLog.Errorf(err_return)
+			return false, err_return
 		} else {
 			res_surveyID, _ := ioutil.ReadAll(res_surveyID.Body)
 			fmt.Println("res_surveyID= ", string(res_surveyID))
@@ -61,19 +65,22 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 			errorCode := gjson.Get(string(res_surveyID), "error.http_status_code").String()
 			if errorCode=="401" {
 				//set return
-				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(res_surveyID), "error.message").String() +`"} }`
-				context.SetOutput("Response_Json", result_return)
-				return true, nil
+				err_return = gjson.Get(string(res_surveyID), "error.message").String()
+				//context.SetOutput("Response_Json", err_return)
+				activityLog.Errorf(err_return)
+				return false, err_return
 			} else if errorCode=="404" {
 				//set return
-				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(res_surveyID), "error.message").String() +`"} }`
-				context.SetOutput("Response_Json", result_return)
-				return true, nil
+				err_return = gjson.Get(string(res_surveyID), "error.message").String()
+				//context.SetOutput("Response_Json", err_return)
+				activityLog.Errorf(err_return)
+				return false, err_return
 			}	else if invalidSurveyName=="0" {
 				//set return
-				result_return = `{ "Error" : { "message" : "Invalid Survey name !!" } }`
-				context.SetOutput("Response_Json", result_return)
-				return true, nil
+				err_return = "Invalid Survey name !!"
+				//context.SetOutput("Response_Json", err_return)
+				activityLog.Errorf(err_return)
+				return false, err_return
 			} else {
 				surveyID = gjson.Get(string(res_surveyID), "data.0.id").String()
 			}
@@ -88,18 +95,20 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		res_surveyDetails, err_surveyDetails := client.Do(request)
 		if err_surveyDetails != nil {
 			//set return
-			result_return = `{ "Error" : { "message" : "The HTTP request for getting SurveyID failed with error `+err_surveyDetails.Error()+`" } }`
-			context.SetOutput("Response_Json", result_return)
-			return true, nil
+			err_return = "The HTTP request for getting SurveyID failed with error: "+err_surveyDetails.Error()
+			//context.SetOutput("Response_Json", err_return)
+			activityLog.Errorf(err_return)
+			return false, err_return
 		} else {
 			surveyDetails, _ := ioutil.ReadAll(res_surveyDetails.Body)
 			//fmt.Println(string(surveyDetails))
 			errorCode := gjson.Get(string(surveyDetails), "error.http_status_code").String()
 			if errorCode=="404" {
 				//set return
-				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(surveyDetails), "error.message").String() +`"} }`
-				context.SetOutput("Response_Json", result_return)
-				return true, nil
+				err_return = gjson.Get(string(surveyDetails), "error.message").String()
+				//context.SetOutput("Response_Json", err_return)
+				activityLog.Errorf(err_return)
+				return false, err_return
 			}
 			//set surveyDetails parent element
 			jsonstr = 	`{ "surveydetails" : `+string(surveyDetails)+`}`
@@ -113,18 +122,20 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
 		res_surveyResponse, err_surveyResponse := client.Do(request)
 		if err_surveyResponse != nil {
 			//set return
-			result_return = `{ "Error" : { "message" : "The HTTP request for getting SurveyID failed with error `+err_surveyResponse.Error()+`" } }`
-			context.SetOutput("Response_Json", result_return)
-			return true, nil
+			err_return = "The HTTP request for getting SurveyID failed with error: "+err_surveyResponse.Error()
+			//context.SetOutput("Response_Json", err_return)
+			activityLog.Errorf(err_return)
+			return false, err_return
 		} else {
 			surveyResponse, _ := ioutil.ReadAll(res_surveyResponse.Body)
 			//fmt.Println(string(surveyResponse))
 			errorCode := gjson.Get(string(surveyResponse), "error.http_status_code").String()
 			if errorCode=="404" {
 				//set return
-				result_return = `{ "Error" : { "message" : "`+ gjson.Get(string(surveyResponse), "error.message").String() +`"} }`
-				context.SetOutput("Response_Json", result_return)
-				return true, nil
+				err_return = gjson.Get(string(surveyResponse), "error.message").String()
+				//context.SetOutput("Response_Json", err_return)
+				activityLog.Errorf(err_return)
+				return false, err_return
 			}
 			//set surveyresponses
 			jsonSR = `{ "surveyresponses" : `+string(surveyResponse)+`}`

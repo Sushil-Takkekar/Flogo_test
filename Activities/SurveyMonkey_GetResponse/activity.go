@@ -56,7 +56,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 			err_return = "The HTTP request for getting SurveyID failed with error: "+err_surveyID.Error()
 			//context.SetOutput("Response_Json", err_return)
 			activityLog.Errorf(err_return)
-			return false, err_return
+			return false, fmt.Errorf(err_return)
 		} else {
 			res_surveyID, _ := ioutil.ReadAll(res_surveyID.Body)
 			fmt.Println("res_surveyID= ", string(res_surveyID))
@@ -68,19 +68,19 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 				err_return = gjson.Get(string(res_surveyID), "error.message").String()
 				//context.SetOutput("Response_Json", err_return)
 				activityLog.Errorf(err_return)
-				return false, err_return
+				return false, fmt.Errorf(err_return)
 			} else if errorCode=="404" {
 				//set return
 				err_return = gjson.Get(string(res_surveyID), "error.message").String()
 				//context.SetOutput("Response_Json", err_return)
 				activityLog.Errorf(err_return)
-				return false, err_return
+				return false, fmt.Errorf(err_return)
 			}	else if invalidSurveyName=="0" {
 				//set return
 				err_return = "Invalid Survey name !!"
 				//context.SetOutput("Response_Json", err_return)
 				activityLog.Errorf(err_return)
-				return false, err_return
+				return false, fmt.Errorf(err_return)
 			} else {
 				surveyID = gjson.Get(string(res_surveyID), "data.0.id").String()
 			}
@@ -98,7 +98,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 			err_return = "The HTTP request for getting SurveyID failed with error: "+err_surveyDetails.Error()
 			//context.SetOutput("Response_Json", err_return)
 			activityLog.Errorf(err_return)
-			return false, err_return
+			return false, fmt.Errorf(err_return)
 		} else {
 			surveyDetails, _ := ioutil.ReadAll(res_surveyDetails.Body)
 			//fmt.Println(string(surveyDetails))
@@ -108,7 +108,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 				err_return = gjson.Get(string(surveyDetails), "error.message").String()
 				//context.SetOutput("Response_Json", err_return)
 				activityLog.Errorf(err_return)
-				return false, err_return
+				return false, fmt.Errorf(err_return)
 			}
 			//set surveyDetails parent element
 			jsonstr = 	`{ "surveydetails" : `+string(surveyDetails)+`}`
@@ -125,7 +125,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 			err_return = "The HTTP request for getting SurveyID failed with error: "+err_surveyResponse.Error()
 			//context.SetOutput("Response_Json", err_return)
 			activityLog.Errorf(err_return)
-			return false, err_return
+			return false, fmt.Errorf(err_return)
 		} else {
 			surveyResponse, _ := ioutil.ReadAll(res_surveyResponse.Body)
 			//fmt.Println(string(surveyResponse))
@@ -135,7 +135,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 				err_return = gjson.Get(string(surveyResponse), "error.message").String()
 				//context.SetOutput("Response_Json", err_return)
 				activityLog.Errorf(err_return)
-				return false, err_return
+				return false, fmt.Errorf(err_return)
 			}
 			//set surveyresponses
 			jsonSR = `{ "surveyresponses" : `+string(surveyResponse)+`}`
@@ -145,6 +145,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 /*-----------------------------------------------------------------------------------------------------------*/
 
 		activityOutput = surveyMonkeyCode.SetSurveyDetails(jsonstr, jsonSR, activityOutput)
+		activityLog.Debugf("Response from survey: %s", activityOutput)
 		context.SetOutput("Response_Json", activityOutput)
 		
 	return true, nil

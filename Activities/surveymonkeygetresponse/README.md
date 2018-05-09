@@ -1,4 +1,4 @@
-# SurveyMonkey_GetResponse
+# SurveyMonkey GetResponse
 
 This activity allows you to get the responses for your survey in a json format. It takes survey name and access token as an input and gives all the responses for that survey in a compact json format, which can be used to represent the stats graphically.
 

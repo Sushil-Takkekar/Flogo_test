@@ -1,9 +1,10 @@
 {
-  "name": "dropboxuploadfile",
+  "name": "Dropbox UploadFile",
   "version": "0.0.1",
   "type": "flogo:activity",
-  "description": "activity description",
-  "author": "Your Name <you.name@example.org>",
+  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/dropboxuploadfile",
+  "description": "Upload file to dropbox server",
+  "author": "Team LetsFlogo",
   "inputs":[
     {
       "name": "accessToken",

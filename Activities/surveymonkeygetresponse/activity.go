@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/Sushil-Takkekar/Flogo_test/Activity_logic/surveymonkeycode"
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 	"github.com/tidwall/gjson"
@@ -134,7 +133,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 
 	/*-----------------------------------------------------------------------------------------------------------*/
 
-	activityOutput = surveyMonkeyCode.SetSurveyDetails(jsonstr, jsonSR, activityOutput)
+	activityOutput = surveymonkeycode.SetSurveyDetails(jsonstr, jsonSR, activityOutput)
 	activityLog.Debugf("Response from survey: %s", activityOutput)
 	context.SetOutput("Response_Json", activityOutput)
 

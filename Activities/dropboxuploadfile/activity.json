@@ -6,13 +6,21 @@
   "author": "Your Name <you.name@example.org>",
   "inputs":[
     {
-      "name": "input",
+      "name": "accessToken",
+      "type": "string"
+    },
+    {
+      "name": "dropboxDestPath",
+      "type": "string"
+    },
+    {
+      "name": "sourceFilePath",
       "type": "string"
     }
   ],
   "outputs": [
     {
-      "name": "output",
+      "name": "result",
       "type": "string"
     }
   ]

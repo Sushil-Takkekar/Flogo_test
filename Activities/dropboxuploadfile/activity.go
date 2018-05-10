@@ -37,14 +37,13 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 	// sourceFile := "D:/BW6/BW6_Export/FilePoller.zip"
 
 	accessToken := context.GetInput("accessToken").(string)
-	DropboxAPIArg := context.GetInput("dropboxDestPath").(string)
+	DropboxAPIArg := `{"path": "` + context.GetInput("dropboxDestPath").(string) + `","mode": "add","autorename": true,"mute": false}`
 	sourceFile := context.GetInput("sourceFilePath").(string)
 
 	//srcFile, err_readFile := os.Open("D:/tmp.txt")
 	srcFile, err_readFile := ioutil.ReadFile(sourceFile)
 	if err_readFile != nil {
-		//fmt.Println(err_readFile.Error())
-		activityLog.Errorf(err_readFile)
+		activityLog.Errorf(err_readFile.Error())
 		return false, err_readFile
 	}
 
@@ -56,23 +55,23 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 	res_uploadFile, err_uploadFile := client.Do(request)
 	if err_uploadFile != nil {
 		//fmt.Printf(err_uploadFile.Error())
-		activityLog.Errorf(err_uploadFile)
+		activityLog.Errorf(err_uploadFile.Error())
 		return false, err_uploadFile
 	}
 	res_uploadFile_data, _ := ioutil.ReadAll(res_uploadFile.Body)
 	if strings.Contains(string(res_uploadFile_data), "Error in call to API function") {
 		//fmt.Println("Error= ", string(res_uploadFile_data))
-		activityLog.Errorf(res_uploadFile_data)
+		activityLog.Errorf(string(res_uploadFile_data))
 		return false, errors.New(string(res_uploadFile_data))
 	}
 	if strings.Contains(string(res_uploadFile_data), "Unknown API function") {
 		//fmt.Println("Error= ", string(res_uploadFile_data))
-		activityLog.Errorf(res_uploadFile_data)
+		activityLog.Errorf(string(res_uploadFile_data))
 		return false, errors.New(string(res_uploadFile_data))
 	}
 	//fmt.Println("res_uploadFile_data= ", string(res_uploadFile_data))
 	activityLog.Debugf("res_uploadFile_data: %s", string(res_uploadFile_data))
-	context.SetOutput("Output", string(res_uploadFile_data))
+	context.SetOutput("result", "Success")
 
 	return true, nil
 }

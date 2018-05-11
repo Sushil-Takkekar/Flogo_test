@@ -2,6 +2,7 @@ package dropboxuploadfile
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -10,6 +11,10 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 )
+
+type Downloaderror struct {
+	Error_summary string
+}
 
 // ActivityLog is the default logger for the Log Activity
 var activityLog = logger.GetLogger("activity-flogo-Dropbox_UploadFile")
@@ -69,6 +74,15 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 		activityLog.Errorf(string(res_uploadFile_data))
 		return false, errors.New(string(res_uploadFile_data))
 	}
+
+	var downloaderror Downloaderror
+	json.Unmarshal([]byte(string(res_uploadFile_data)), &downloaderror)
+	if downloaderror.Error_summary != "" {
+		//fmt.Println("error_summary=", downloaderror.Error_summary)
+		activityLog.Errorf(downloaderror.Error_summary)
+		return false, errors.New(downloaderror.Error_summary)
+	}
+
 	//fmt.Println("res_uploadFile_data= ", string(res_uploadFile_data))
 	activityLog.Debugf("res_uploadFile_data: %s", string(res_uploadFile_data))
 	context.SetOutput("result", "Success")

@@ -1,0 +1,24 @@
+{
+  "name": "Dropbox DownloadFile",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/dropboxdownloadfile",
+  "description": "This activity is used to download a file from dropbox",
+  "author": "Team LetsFlogo",
+  "inputs":[
+    {
+      "name": "accessToken",
+      "type": "string"
+    },
+    {
+      "name": "downloadSourcePath",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "fileContents",
+      "type": "any"
+    }
+  ]
+}

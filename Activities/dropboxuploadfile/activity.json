@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "type": "flogo:activity",
   "ref": "github.com/Sushil-Takkekar/Flogo_test/Activities/dropboxuploadfile",
-  "description": "Upload file to dropbox server",
+  "description": "This activity is used to upload a file to the dropbox",
   "author": "Team LetsFlogo",
   "inputs":[
     {

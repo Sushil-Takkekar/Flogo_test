@@ -16,6 +16,9 @@ type Downloaderror struct {
 // SetSurveyDetails maps the required data from survey response to output
 func DownloadFile(accessToken string, DropboxAPIArg string) (result []byte, err error) {
 
+	//accessToken := "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-"
+	//DropboxAPIArg := `{"path": "/Home/t1/tmp.txt"}`
+
 	var res []byte
 	request, _ := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/download", nil)
 	request.Header.Set("Authorization", "Bearer "+accessToken)

@@ -52,7 +52,7 @@ func TestEval(t *testing.T) {
 	//TestCase No-1
 	//setup attrs
 	tc.SetInput("accessToken", "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-")
-	tc.SetInput("downloadSourcePath", "/test/hello.txt")
+	tc.SetInput("downloadSourcePath", "/down/hello.txt")
 	act.Eval(tc)
 	//check result attr
 	fileContents := tc.GetOutput("fileContents")
@@ -68,7 +68,7 @@ func TestEval(t *testing.T) {
 	//TestCase No-2
 	//setup attrs
 	tc.SetInput("accessToken", "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-")
-	tc.SetInput("downloadSourcePath", "/test/sample.zip")
+	tc.SetInput("downloadSourcePath", "/down/sample.zip")
 	act.Eval(tc)
 	//check result attr
 	fileContents2 := tc.GetOutput("fileContents")

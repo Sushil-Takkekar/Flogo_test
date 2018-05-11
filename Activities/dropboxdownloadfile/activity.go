@@ -32,9 +32,6 @@ func (a *DropboxDownloadFileActivity) Metadata() *activity.Metadata {
 // Eval implements activity.Activity.Eval
 func (a *DropboxDownloadFileActivity) Eval(context activity.Context) (done bool, err error) {
 	// Initialize parameters
-	//accessToken := "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-"
-	//DropboxAPIArg := `{"path": "/Home/t1/tmp.txt"}`
-
 	accessToken := context.GetInput("accessToken").(string)
 	DropboxAPIArg := `{"path": "` + context.GetInput("downloadSourcePath").(string) + `"}`
 

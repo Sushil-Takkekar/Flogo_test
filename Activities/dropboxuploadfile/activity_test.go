@@ -69,9 +69,9 @@ func TestEval(t *testing.T) {
 	tc.SetInput("dropboxDestPath", "/Home/TestUpload/sample.zip")
 	tc.SetInput("sourceFilePath", "")
 	// Read binary data as a file
-	binaryData, err_binaryData := ioutil.ReadFile("D:/Flogo/sample.zip")
-	if err_binaryData != nil {
-		fmt.Println(err_binaryData.Error())
+	binaryData, errBinaryData := ioutil.ReadFile("D:/Flogo/sample.zip")
+	if errBinaryData != nil {
+		fmt.Println(errBinaryData.Error())
 	}
 	tc.SetInput("binaryContent", binaryData)
 	act.Eval(tc)

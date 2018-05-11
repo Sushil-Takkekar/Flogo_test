@@ -35,7 +35,7 @@ flogo install github.com/Sushil-Takkekar/Flogo_test/Activities/surveymonkeygetre
   "outputs": [
     {
       "name": "Response_Json",
-      "type": "string"
+      "type": "object"
     }
   ]
 }

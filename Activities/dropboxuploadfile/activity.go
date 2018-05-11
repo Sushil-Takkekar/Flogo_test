@@ -17,8 +17,9 @@ const (
 	srcBinaryContent = "Binary data"
 )
 
+// Downloaderror is the struct for download error
 type Downloaderror struct {
-	Error_summary string
+	ErrorSummary string
 }
 
 // ActivityLog is the default logger for the Log Activity
@@ -54,14 +55,14 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 
 	// Get source file contents
 	var srcFile []byte
-	var err_readFile error
+	var errReadFile error
 	switch sourceType {
 	case srcFilePath:
-		//srcFile, err_readFile := os.Open("D:/tmp.txt")
-		srcFile, err_readFile = ioutil.ReadFile(sourceFilePath)
-		if err_readFile != nil {
-			activityLog.Errorf(err_readFile.Error())
-			return false, err_readFile
+		//srcFile, errReadFile := os.Open("D:/tmp.txt")
+		srcFile, errReadFile = ioutil.ReadFile(sourceFilePath)
+		if errReadFile != nil {
+			activityLog.Errorf(errReadFile.Error())
+			return false, errReadFile
 		}
 
 	case srcBinaryContent:
@@ -73,34 +74,34 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 	request.Header.Set("Content-Type", "application/octet-stream")
 	request.Header.Set("Dropbox-API-Arg", DropboxAPIArg)
 	client := &http.Client{}
-	res_uploadFile, err_uploadFile := client.Do(request)
-	if err_uploadFile != nil {
-		//fmt.Printf(err_uploadFile.Error())
-		activityLog.Errorf(err_uploadFile.Error())
-		return false, err_uploadFile
+	resUploadFile, errUploadFile := client.Do(request)
+	if errUploadFile != nil {
+		//fmt.Printf(errUploadFile.Error())
+		activityLog.Errorf(errUploadFile.Error())
+		return false, errUploadFile
 	}
-	res_uploadFile_data, _ := ioutil.ReadAll(res_uploadFile.Body)
-	if strings.Contains(string(res_uploadFile_data), "Error in call to API function") {
-		//fmt.Println("Error= ", string(res_uploadFile_data))
-		activityLog.Errorf(string(res_uploadFile_data))
-		return false, errors.New(string(res_uploadFile_data))
+	resUploadFileData, _ := ioutil.ReadAll(resUploadFile.Body)
+	if strings.Contains(string(resUploadFileData), "Error in call to API function") {
+		//fmt.Println("Error= ", string(resUploadFileData))
+		activityLog.Errorf(string(resUploadFileData))
+		return false, errors.New(string(resUploadFileData))
 	}
-	if strings.Contains(string(res_uploadFile_data), "Unknown API function") {
-		//fmt.Println("Error= ", string(res_uploadFile_data))
-		activityLog.Errorf(string(res_uploadFile_data))
-		return false, errors.New(string(res_uploadFile_data))
+	if strings.Contains(string(resUploadFileData), "Unknown API function") {
+		//fmt.Println("Error= ", string(resUploadFileData))
+		activityLog.Errorf(string(resUploadFileData))
+		return false, errors.New(string(resUploadFileData))
 	}
 
 	var downloaderror Downloaderror
-	json.Unmarshal([]byte(string(res_uploadFile_data)), &downloaderror)
-	if downloaderror.Error_summary != "" {
-		//fmt.Println("error_summary=", downloaderror.Error_summary)
-		activityLog.Errorf(downloaderror.Error_summary)
-		return false, errors.New(downloaderror.Error_summary)
+	json.Unmarshal([]byte(string(resUploadFileData)), &downloaderror)
+	if downloaderror.ErrorSummary != "" {
+		//fmt.Println("error_summary=", downloaderror.ErrorSummary)
+		activityLog.Errorf(downloaderror.ErrorSummary)
+		return false, errors.New(downloaderror.ErrorSummary)
 	}
 
-	//fmt.Println("res_uploadFile_data= ", string(res_uploadFile_data))
-	activityLog.Debugf("res_uploadFile_data: %s", string(res_uploadFile_data))
+	//fmt.Println("resUploadFileData= ", string(resUploadFileData))
+	activityLog.Debugf("resUploadFileData: %s", string(resUploadFileData))
 	context.SetOutput("result", "Success")
 
 	return true, nil

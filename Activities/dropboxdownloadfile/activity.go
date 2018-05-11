@@ -11,8 +11,9 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 )
 
+// Downloaderror is the struct for download error
 type Downloaderror struct {
-	Error_summary string
+	ErrorSummary string
 }
 
 // ActivityLog is the default logger for the Log Activity
@@ -46,34 +47,34 @@ func (a *DropboxDownloadFileActivity) Eval(context activity.Context) (done bool,
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	request.Header.Set("Dropbox-API-Arg", DropboxAPIArg)
 	client := &http.Client{}
-	res_downloadFile, err_downloadFile := client.Do(request)
-	if err_downloadFile != nil {
-		//fmt.Printf(err_downloadFile.Error())
-		activityLog.Errorf(err_downloadFile.Error())
-		return false, err_downloadFile
+	resDownloadFile, errDownloadFile := client.Do(request)
+	if errDownloadFile != nil {
+		//fmt.Printf(errDownloadFile.Error())
+		activityLog.Errorf(errDownloadFile.Error())
+		return false, errDownloadFile
 	}
-	res_downloadFile_data, _ := ioutil.ReadAll(res_downloadFile.Body)
-	if strings.Contains(string(res_downloadFile_data), "Error in call to API function") {
-		//fmt.Println("Error= ", string(res_downloadFile_data))
-		activityLog.Errorf(string(res_downloadFile_data))
-		return false, errors.New(string(res_downloadFile_data))
+	resDownloadFileData, _ := ioutil.ReadAll(resDownloadFile.Body)
+	if strings.Contains(string(resDownloadFileData), "Error in call to API function") {
+		//fmt.Println("Error= ", string(resDownloadFileData))
+		activityLog.Errorf(string(resDownloadFileData))
+		return false, errors.New(string(resDownloadFileData))
 	}
-	if strings.Contains(string(res_downloadFile_data), "Unknown API function") {
-		//fmt.Println("Error= ", string(res_downloadFile_data))
-		activityLog.Errorf(string(res_downloadFile_data))
-		return false, errors.New(string(res_downloadFile_data))
+	if strings.Contains(string(resDownloadFileData), "Unknown API function") {
+		//fmt.Println("Error= ", string(resDownloadFileData))
+		activityLog.Errorf(string(resDownloadFileData))
+		return false, errors.New(string(resDownloadFileData))
 	}
 
 	var downloaderror Downloaderror
-	json.Unmarshal([]byte(string(res_downloadFile_data)), &downloaderror)
-	if downloaderror.Error_summary != "" {
-		//fmt.Println("error_summary=", downloaderror.Error_summary)
-		activityLog.Errorf(downloaderror.Error_summary)
-		return false, errors.New(downloaderror.Error_summary)
+	json.Unmarshal([]byte(string(resDownloadFileData)), &downloaderror)
+	if downloaderror.ErrorSummary != "" {
+		//fmt.Println("error_summary=", downloaderror.ErrorSummary)
+		activityLog.Errorf(downloaderror.ErrorSummary)
+		return false, errors.New(downloaderror.ErrorSummary)
 	}
 
-	//fmt.Println("res_downloadFile_data= ", string(res_downloadFile_data))
-	activityLog.Debugf("res_downloadFile_data: %s", res_downloadFile_data)
-	context.SetOutput("fileContents", res_downloadFile_data)
+	//fmt.Println("resDownloadFileData= ", string(resDownloadFileData))
+	activityLog.Debugf("resDownloadFileData: %s", resDownloadFileData)
+	context.SetOutput("fileContents", resDownloadFileData)
 	return true, nil
 }

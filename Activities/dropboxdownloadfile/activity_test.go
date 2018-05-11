@@ -57,8 +57,8 @@ func TestEval(t *testing.T) {
 	//check result attr
 	fileContents := tc.GetOutput("fileContents")
 	// Read expected data from file
-	expFile, err_expFile := ioutil.ReadFile("D:/Flogo/hello.txt")
-	if err_expFile != nil {
+	expFile, errExpFile := ioutil.ReadFile("D:/Flogo/hello.txt")
+	if errExpFile != nil {
 		assert.Equal(t, "", fileContents)
 	} else {
 		assert.Equal(t, expFile, fileContents)
@@ -73,8 +73,8 @@ func TestEval(t *testing.T) {
 	//check result attr
 	fileContents2 := tc.GetOutput("fileContents")
 	// Read expected data from file
-	expFile1, err_expFile1 := ioutil.ReadFile("D:/Flogo/sample.zip")
-	if err_expFile1 != nil {
+	expFile1, errExpFile1 := ioutil.ReadFile("D:/Flogo/sample.zip")
+	if errExpFile1 != nil {
 		assert.Equal(t, "", fileContents2)
 	} else {
 		assert.Equal(t, expFile1, fileContents2)

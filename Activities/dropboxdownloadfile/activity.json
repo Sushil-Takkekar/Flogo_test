@@ -8,11 +8,13 @@
   "inputs":[
     {
       "name": "accessToken",
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     {
       "name": "downloadSourcePath",
-      "type": "string"
+      "type": "string",
+      "required": true
     }
   ],
   "outputs": [

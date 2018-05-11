@@ -38,7 +38,7 @@ func (a *DropboxDownloadFileActivity) Eval(context activity.Context) (done bool,
 	accessToken := context.GetInput("accessToken").(string)
 	DropboxAPIArg := `{"path": "` + context.GetInput("downloadSourcePath").(string) + `"}`
 
-	result, err := dropboxcode.downloadFile(accessToken, DropboxAPIArg)
+	result, err := dropboxcode.DownloadFile(accessToken, DropboxAPIArg)
 
 	if err != nil {
 		activityLog.Errorf(err.Error())

@@ -14,7 +14,7 @@ type Downloaderror struct {
 }
 
 // SetSurveyDetails maps the required data from survey response to output
-func downloadFile(accessToken string, DropboxAPIArg string) (result []byte, err error) {
+func DownloadFile(accessToken string, DropboxAPIArg string) (result []byte, err error) {
 
 	var res []byte
 	request, _ := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/download", nil)

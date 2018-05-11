@@ -6,15 +6,10 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 )
 
-const (
-	srcFilePath      = "File path"
-	srcBinaryContent = "Binary data"
-)
-
 // Downloaderror is the struct for download error
-type Downloaderror struct {
-	ErrorSummary string
-}
+// type Downloaderror struct {
+// 	ErrorSummary string
+// }
 
 // ActivityLog is the default logger for the Log Activity
 var activityLog = logger.GetLogger("activity-flogo-Dropbox_UploadFile")

@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	srcFilePath      = "File path"
+	srcBinaryContent = "Binary data"
+)
+
 // Downloaderror is the struct for download error
 type Downloaderror struct {
 	ErrorSummary string
@@ -16,7 +21,8 @@ type Downloaderror struct {
 
 func UploadFile(accessToken string, sourceType string, DropboxAPIArg string, sourceFilePath string, binaryContent []byte) (result []byte, err error) {
 	// Get source file contents
-	var srcFile []byte
+	var srcFile, res []byte
+	//var res []byte
 	var errReadFile error
 	switch sourceType {
 	case srcFilePath:
@@ -24,14 +30,13 @@ func UploadFile(accessToken string, sourceType string, DropboxAPIArg string, sou
 		srcFile, errReadFile = ioutil.ReadFile(sourceFilePath)
 		if errReadFile != nil {
 			//activityLog.Errorf(errReadFile.Error())
-			return false, errReadFile
+			return res, errReadFile
 		}
 
 	case srcBinaryContent:
 		srcFile = binaryContent
 	}
 
-	var res []byte
 	request, _ := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/upload", bytes.NewBuffer(srcFile))
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	request.Header.Set("Content-Type", "application/octet-stream")

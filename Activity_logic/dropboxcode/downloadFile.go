@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-// Downloaderror is the struct for download error
-type Downloaderror struct {
-	ErrorSummary string
-}
+// // Downloaderror is the struct for download error
+// type Downloaderror struct {
+// 	ErrorSummary string
+// }
 
 // SetSurveyDetails maps the required data from survey response to output
 func DownloadFile(accessToken string, DropboxAPIArg string) (result []byte, err error) {

@@ -51,12 +51,12 @@ func TestEval(t *testing.T) {
 
 	//TestCase No-1 (File path)
 	//setup attrs
-	var tmp []byte
+	//var tmp []byte
 	tc.SetInput("accessToken", "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-")
 	tc.SetInput("sourceType", "File path")
 	tc.SetInput("dropboxDestPath", "/Home/TestUpload/myconfig.zip")
 	tc.SetInput("sourceFilePath", "D:/BW6/BW6_Export/FilePoller.zip")
-	tc.SetInput("binaryContent", tmp)
+	//tc.SetInput("binaryContent", tmp)
 	act.Eval(tc)
 	//check result attr
 	result := tc.GetOutput("result")
@@ -67,7 +67,7 @@ func TestEval(t *testing.T) {
 	tc.SetInput("accessToken", "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-")
 	tc.SetInput("sourceType", "Binary data")
 	tc.SetInput("dropboxDestPath", "/Home/TestUpload/sample.zip")
-	tc.SetInput("sourceFilePath", "")
+	//tc.SetInput("sourceFilePath", "")
 	// Read binary data as a file
 	binaryData, errBinaryData := ioutil.ReadFile("D:/Flogo/sample.zip")
 	if errBinaryData != nil {

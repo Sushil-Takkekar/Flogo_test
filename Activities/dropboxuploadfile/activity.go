@@ -33,11 +33,14 @@ func (a *DropboxUploadFileActivity) Metadata() *activity.Metadata {
 func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, err error) {
 	// Initialize parameters
 
+	var binaryContent []byte
 	accessToken := context.GetInput("accessToken").(string)
 	sourceType := context.GetInput("sourceType").(string)
 	DropboxAPIArg := `{"path": "` + context.GetInput("dropboxDestPath").(string) + `","mode": "add","autorename": true,"mute": false}`
 	sourceFilePath := context.GetInput("sourceFilePath").(string)
-	binaryContent := context.GetInput("binaryContent").([]byte)
+	if sourceType == "Binary data" {
+		binaryContent = context.GetInput("binaryContent").([]byte)
+	}
 
 	result, err := dropboxcode.UploadFile(accessToken, sourceType, DropboxAPIArg, sourceFilePath, binaryContent)
 

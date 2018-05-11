@@ -47,7 +47,7 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 	}
 
 	//fmt.Println("resUploadFileData= ", string(resUploadFileData))
-	activityLog.Debugf("resUploadFileData: %s", string(resUploadFileData))
+	activityLog.Debugf("Result: %s", string(result))
 	context.SetOutput("result", "Success")
 	return true, nil
 }

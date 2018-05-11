@@ -12,6 +12,11 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 )
 
+const (
+	srcFilePath      = "File path"
+	srcBinaryContent = "Binary data"
+)
+
 type Downloaderror struct {
 	Error_summary string
 }
@@ -42,14 +47,25 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 	// sourceFile := "D:/BW6/BW6_Export/FilePoller.zip"
 
 	accessToken := context.GetInput("accessToken").(string)
+	sourceType := context.GetInput("sourceType").(string)
 	DropboxAPIArg := `{"path": "` + context.GetInput("dropboxDestPath").(string) + `","mode": "add","autorename": true,"mute": false}`
-	sourceFile := context.GetInput("sourceFilePath").(string)
+	sourceFilePath := context.GetInput("sourceFilePath").(string)
+	binaryContent := context.GetInput("binaryContent").([]byte)
 
-	//srcFile, err_readFile := os.Open("D:/tmp.txt")
-	srcFile, err_readFile := ioutil.ReadFile(sourceFile)
-	if err_readFile != nil {
-		activityLog.Errorf(err_readFile.Error())
-		return false, err_readFile
+	// Get source file contents
+	var srcFile []byte
+	var err_readFile error
+	switch sourceType {
+	case srcFilePath:
+		//srcFile, err_readFile := os.Open("D:/tmp.txt")
+		srcFile, err_readFile = ioutil.ReadFile(sourceFilePath)
+		if err_readFile != nil {
+			activityLog.Errorf(err_readFile.Error())
+			return false, err_readFile
+		}
+
+	case srcBinaryContent:
+		srcFile = binaryContent
 	}
 
 	request, _ := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/upload", bytes.NewBuffer(srcFile))

@@ -8,15 +8,31 @@
   "inputs":[
     {
       "name": "accessToken",
-      "type": "string"
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "sourceType",
+      "type": "string",
+      "allowed": [
+        "File path",
+        "Binary data"
+      ],
+      "value": "File path",
+      "required": true
     },
     {
       "name": "dropboxDestPath",
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     {
       "name": "sourceFilePath",
       "type": "string"
+    },
+    {
+      "name": "binaryContent",
+      "type": "any"
     }
   ],
   "outputs": [

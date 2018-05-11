@@ -1,6 +1,7 @@
 package dropboxuploadfile
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -48,13 +49,33 @@ func TestEval(t *testing.T) {
 	act := NewActivity(getActivityMetadata())
 	tc := test.NewTestActivityContext(getActivityMetadata())
 
-	//TestCase No-1
+	//TestCase No-1 (File path)
 	//setup attrs
+	var tmp []byte
 	tc.SetInput("accessToken", "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-")
+	tc.SetInput("sourceType", "File path")
 	tc.SetInput("dropboxDestPath", "/Home/TestUpload/myconfig.zip")
 	tc.SetInput("sourceFilePath", "D:/BW6/BW6_Export/FilePoller.zip")
+	tc.SetInput("binaryContent", tmp)
 	act.Eval(tc)
 	//check result attr
 	result := tc.GetOutput("result")
 	assert.Equal(t, "Success", result)
+
+	//TestCase No-2 (Binary data)
+	//setup attrs
+	tc.SetInput("accessToken", "XO7WTFIqKvUAAAAAAAABdP3i3khVOQ7TBNPP-Gm3rg9GbtUl3TEH90MG3cNZ0-i-")
+	tc.SetInput("sourceType", "Binary data")
+	tc.SetInput("dropboxDestPath", "/Home/TestUpload/sample.zip")
+	tc.SetInput("sourceFilePath", "")
+	// Read binary data as a file
+	binaryData, err_binaryData := ioutil.ReadFile("D:/Flogo/sample.zip")
+	if err_binaryData != nil {
+		fmt.Println(err_binaryData.Error())
+	}
+	tc.SetInput("binaryContent", binaryData)
+	act.Eval(tc)
+	//check result attr
+	result2 := tc.GetOutput("result")
+	assert.Equal(t, "Success", result2)
 }

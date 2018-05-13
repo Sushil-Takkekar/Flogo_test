@@ -44,7 +44,7 @@ func (a *DropboxUploadFileActivity) Eval(context activity.Context) (done bool, e
 		return false, err
 	}
 
-	//activityLog.Debugf("Result: %s", string(result))
+	activityLog.Debugf("Activity result: %s", string(result))
 	context.SetOutput("result", "Success")
 	return true, nil
 }

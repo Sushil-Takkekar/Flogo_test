@@ -13,23 +13,23 @@ import (
 
 // CallRest is used to make rest api call
 func CallRest(method string, url string, bodyContent *bytes.Buffer, accessToken string) (response string, err error) {
-	request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
+	request, _ := http.NewRequest(method, url, bodyContent)
 	request.Header.Set("Authorization", "bearer "+accessToken)
 	request.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
-	response, errRes := client.Do(request)
-	if errRes != nil {
+	resp, errResp := client.Do(request)
+	if errResp != nil {
 		//set return
-		errReturn = "The HTTP request failed with error: " + errRes.Error()
+		errReturn := "The HTTP request failed with error: " + errResp.Error()
 		//activityLog.Errorf(errReturn)
 		return "", errors.New(errReturn)
 	}
-	res, _ := ioutil.ReadAll(response.Body)
-	err := gjson.Get(string(res), "error.http_status_code").String()
-	if err != "" {
+	res, _ := ioutil.ReadAll(resp.Body)
+	errRes := gjson.Get(string(res), "error.http_status_code").String()
+	if errRes != "" {
 		return "", errors.New(gjson.Get(string(res), "error.message").String())
 	}
-	return res, nil
+	return string(res), nil
 }
 
 // SetSurveyDetails maps the required data from survey response to output
@@ -37,13 +37,13 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 	jsonstr := ""
 	jsonSR := ""
 	activityOutput := `{ "survey" : { "questions" : [] } }`
-	errReturn := ""
-	resSurveyID, surveyDetails := ""
+	var errRest error
+	var resSurveyID, surveyDetails, surveyResponse, errReturn string
 
 	surveyID := ""
-	resSurveyID, errReturn = CallRest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil, accessToken)
-	if errReturn != nil {
-		return "", errors.New(errReturn)
+	resSurveyID, errRest = CallRest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil, accessToken)
+	if errRest != nil {
+		return "", errRest
 	}
 	// request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
 	// request.Header.Set("Authorization", "bearer "+accessToken)
@@ -82,9 +82,9 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 
 	/*--------------------------------------------------------------------------------------------------*/
 
-	surveyDetails, errReturn = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/details", nil, accessToken)
-	if errReturn != nil {
-		return "", errors.New(errReturn)
+	surveyDetails, errRest = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/details", nil, accessToken)
+	if errRest != nil {
+		return "", errRest
 	}
 	// linkSurveyDetails := "https://api.surveymonkey.com/v3/surveys/" + surveyID + "/details"
 	// request, _ = http.NewRequest("GET", linkSurveyDetails, nil)
@@ -112,9 +112,9 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 
 	/*--------------------------------------------------------------------------------------------------*/
 
-	surveyResponse, errReturn = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/responses/bulk", nil, accessToken)
-	if errReturn != nil {
-		return "", errors.New(errReturn)
+	surveyResponse, errRest = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/responses/bulk", nil, accessToken)
+	if errRest != nil {
+		return "", errRest
 	}
 	// linkSurveyResponse := "https://api.surveymonkey.com/v3/surveys/" + surveyID + "/responses/bulk"
 	// request, _ = http.NewRequest("GET", linkSurveyResponse, nil)

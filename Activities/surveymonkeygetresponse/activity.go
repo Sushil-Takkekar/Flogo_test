@@ -39,6 +39,7 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 		return false, err
 	}
 
+	//fmt.Println(result)
 	activityLog.Debugf("Result: %s", result)
 	context.SetOutput("Response_Json", result)
 

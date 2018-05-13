@@ -1,6 +1,7 @@
 package surveymonkeygetresponse
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"testing"
 
@@ -51,9 +52,16 @@ func TestEval(t *testing.T) {
 	//TestCase No-1
 	//setup attrs
 	tc.SetInput("Access_Token", "z8UFEI9i5ua1WWhI40S1xo8yLlFJFsOPMdwtsB83YYAJy.1fr.zPLQ9mfrh7a2qTZHqdCwwnMHHn9.U0OvXcyx5SjYLRjcMUsE-YE6mcZAB0fg4lP2zoDNg-sL8fxDoQ")
-	tc.SetInput("Survey_Name", "FLG_2_QA_Variety")
+	tc.SetInput("Survey_Name", "FLG_Demo")
 	act.Eval(tc)
 	//check result attr
-	result1 := tc.GetOutput("Response_Json")
-	assert.Equal(t, result1, result1)
+	res := tc.GetOutput("Response_Json")
+	result1, _ := json.Marshal(res)
+	// Read expected data from file
+	expFile, errExpFile := ioutil.ReadFile("D:/Flogo/Go_test/FLG_Demo.json")
+	if errExpFile != nil {
+		assert.Equal(t, "", result1)
+	} else {
+		assert.Equal(t, string(expFile), string(result1))
+	}
 }

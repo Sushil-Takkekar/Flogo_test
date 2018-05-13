@@ -22,11 +22,11 @@ func CallRest(method string, url string, bodyContent *bytes.Buffer, accessToken 
 	}
 	resp, errResp := client.Do(request)
 	if errResp != nil {
-		//set return
+		//set err return
 		errReturn := "The HTTP request failed with error: " + errResp.Error()
-		//activityLog.Errorf(errReturn)
 		return "", errors.New(errReturn)
 	}
+	// Close http connection
 	defer resp.Body.Close()
 	res, _ := ioutil.ReadAll(resp.Body)
 	errRes := gjson.Get(string(res), "error.http_status_code").String()
@@ -68,7 +68,7 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 	if errRest != nil {
 		return "", errRest
 	}
-	// Set surveydetails
+	// Set survey details json
 	jsonstr = `{ "surveydetails" : ` + string(surveyDetails) + `}`
 
 	// Get all the responses of a survey
@@ -76,17 +76,16 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 	if errRest != nil {
 		return "", errRest
 	}
-	// Set surveyresponses
+
+	// Set survey responses json
 	jsonSR = `{ "surveyresponses" : ` + string(surveyResponse) + `}`
 
 	/*----------------------------------------------------------------------------*/
 	// Mapping logic
 	questions := gjson.Get(jsonstr, "surveydetails.pages.0.questions")
 	for _, que := range questions.Array() {
-		//fmt.Println("que= ",que.String())
 		queIndex := gjson.Get(activityOutput, "survey.questions.#").String()
-		//fmt.Println("queIndex= " + queIndex)
-		//set heading
+
 		activityOutputTmp, _ := sjson.Set(activityOutput, "survey.questions."+queIndex+".title", gjson.Get(que.String(), "headings.0.heading").String())
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".id", gjson.Get(que.String(), "id").String())
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".validation", gjson.Get(que.String(), "validation").String())
@@ -95,6 +94,7 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".family", gjson.Get(que.String(), "family").String())
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".type", gjson.Get(que.String(), "required.type").String())
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".visible", gjson.Get(que.String(), "visible").String())
+
 		//set answers-rows
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.rows.0.id", "")
 		rows := gjson.Get(que.String(), "answers.rows")
@@ -104,6 +104,7 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 			activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".position", gjson.Get(row.String(), "position").String())
 			activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.rows."+strconv.Itoa(r)+".id", gjson.Get(row.String(), "id").String())
 		}
+
 		//set answers-other
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.other.id", gjson.Get(que.String(), "answers.other.id").String())
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.other.visible", gjson.Get(que.String(), "answers.other.visible").String())
@@ -114,6 +115,7 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.other.num_chars", gjson.Get(que.String(), "answers.other.num_chars").String())
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.other.error_text", gjson.Get(que.String(), "answers.other.error_text").String())
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.other.num_lines", gjson.Get(que.String(), "answers.other.num_lines").String())
+
 		//set answer-choices
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.choices.0.id", "")
 		choice := gjson.Get(que.String(), "answers.choices")
@@ -126,7 +128,9 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 			activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.choices."+strconv.Itoa(c)+".description", gjson.Get(ch.String(), "description").String())
 			activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".answers.choices."+strconv.Itoa(c)+".id", gjson.Get(ch.String(), "id").String())
 		}
+
 		/*************************************************************************************/
+		// Map survey responses to output json
 		activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".responses.0.id", "")
 		responses := gjson.Get(jsonSR, "surveyresponses.data")
 		for rs, res := range responses.Array() {
@@ -140,13 +144,12 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 				activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".row_id", gjson.Get(ans.String(), "row_id").String())
 				//set answer title from surveydetails
 				activityOutputTmp, _ = sjson.Set(activityOutputTmp, "survey.questions."+queIndex+".responses."+strconv.Itoa(rs)+".answers."+strconv.Itoa(a)+".title", gjson.Get(que.String(), `answers.choices.#[id="`+gjson.Get(ans.String(), "choice_id").String()+`"].text`).String())
-				//fmt.Println("------------>",gjson.Get(ans.String(), "choice_id").String())
 			}
 		}
 		/*************************************************************************************/
 		//Update actual output var
 		activityOutput = activityOutputTmp
 	} //end of outer loop
-	//fmt.Println("activityOutput= ", activityOutput)
+
 	return activityOutput, nil
 }

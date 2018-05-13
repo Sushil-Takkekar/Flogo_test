@@ -6,11 +6,6 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 )
 
-// // Downloaderror is the struct for download error
-// type Downloaderror struct {
-// 	ErrorSummary string
-// }
-
 // ActivityLog is the default logger for the Log Activity
 var activityLog = logger.GetLogger("activity-flogo-Dropbox_DownloadFile")
 
@@ -41,8 +36,8 @@ func (a *DropboxDownloadFileActivity) Eval(context activity.Context) (done bool,
 		activityLog.Errorf(err.Error())
 		return false, err
 	}
-	//fmt.Println("resDownloadFileData= ", string(resDownloadFileData))
-	activityLog.Debugf("Result: %s", result)
+
+	//activityLog.Debugf("Result: %s", result)
 	context.SetOutput("fileContents", result)
 	return true, nil
 }

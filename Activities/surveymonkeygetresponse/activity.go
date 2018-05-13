@@ -31,16 +31,13 @@ func (a *SurveyMonkeyGetResponseActivity) Eval(context activity.Context) (done b
 	accessToken := context.GetInput("Access_Token").(string)
 	surveyName := context.GetInput("Survey_Name").(string)
 
-	/*-----------------------------------------------------------------------------------------------------------*/
-
 	result, err := surveymonkeycode.SetSurveyDetails(accessToken, surveyName)
 	if err != nil {
 		activityLog.Errorf(err.Error())
 		return false, err
 	}
 
-	//fmt.Println(result)
-	activityLog.Debugf("Result: %s", result)
+	//activityLog.Debugf("Result: %s", result)
 	context.SetOutput("Response_Json", result)
 
 	return true, nil

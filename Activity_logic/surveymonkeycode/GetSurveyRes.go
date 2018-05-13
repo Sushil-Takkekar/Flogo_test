@@ -87,7 +87,7 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 
 	/*--------------------------------------------------------------------------------------------------*/
 
-	var jsonBody = []byte("")
+	jsonBody = []byte("")
 	surveyDetails, errRest = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/details", bytes.NewBuffer(jsonBody), accessToken)
 	if errRest != nil {
 		return "", errRest
@@ -118,7 +118,7 @@ func SetSurveyDetails(accessToken string, surveyName string) (result string, err
 
 	/*--------------------------------------------------------------------------------------------------*/
 
-	var jsonBody = []byte("")
+	jsonBody = []byte("")
 	surveyResponse, errRest = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/responses/bulk", bytes.NewBuffer(jsonBody), accessToken)
 	if errRest != nil {
 		return "", errRest

@@ -8,11 +8,13 @@
   "inputs":[
     {
       "name": "Access_Token",
-      "type": "string"
+      "type": "string",
+      "required": true
     },
 	{
       "name": "Survey_Name",
-      "type": "string"
+      "type": "string",
+      "required": true
     }
   ],
   "outputs": [

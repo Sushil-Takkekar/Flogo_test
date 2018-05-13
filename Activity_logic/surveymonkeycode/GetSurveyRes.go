@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
@@ -16,7 +17,9 @@ func CallRest(method string, url string, bodyContent *bytes.Buffer, accessToken 
 	request, _ := http.NewRequest(method, url, bodyContent)
 	request.Header.Set("Authorization", "bearer "+accessToken)
 	request.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 30,
+	}
 	resp, errResp := client.Do(request)
 	if errResp != nil {
 		//set return
@@ -24,6 +27,7 @@ func CallRest(method string, url string, bodyContent *bytes.Buffer, accessToken 
 		//activityLog.Errorf(errReturn)
 		return "", errors.New(errReturn)
 	}
+	defer resp.Body.Close()
 	res, _ := ioutil.ReadAll(resp.Body)
 	errRes := gjson.Get(string(res), "error.http_status_code").String()
 	if errRes != "" {

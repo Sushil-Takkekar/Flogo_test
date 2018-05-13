@@ -1,6 +1,7 @@
 package surveymonkeycode
 
 import (
+	"bytes"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -10,98 +11,136 @@ import (
 	"github.com/tidwall/sjson"
 )
 
+// CallRest is used to make rest api call
+func CallRest(method string, url string, bodyContent *bytes.Buffer, accessToken string) (response string, err error) {
+	request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
+	request.Header.Set("Authorization", "bearer "+accessToken)
+	request.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	response, errRes := client.Do(request)
+	if errRes != nil {
+		//set return
+		errReturn = "The HTTP request failed with error: " + errRes.Error()
+		//activityLog.Errorf(errReturn)
+		return "", errors.New(errReturn)
+	}
+	res, _ := ioutil.ReadAll(response.Body)
+	err := gjson.Get(string(res), "error.http_status_code").String()
+	if err != "" {
+		return "", errors.New(gjson.Get(string(res), "error.message").String())
+	}
+	return res, nil
+}
+
 // SetSurveyDetails maps the required data from survey response to output
 func SetSurveyDetails(accessToken string, surveyName string) (result string, err error) {
 	jsonstr := ""
 	jsonSR := ""
 	activityOutput := `{ "survey" : { "questions" : [] } }`
 	errReturn := ""
-	errorCode := ""
+	resSurveyID, surveyDetails := ""
 
-	request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
-	request.Header.Set("Authorization", "bearer "+accessToken)
-	request.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resSurveyIDData, errSurveyID := client.Do(request)
 	surveyID := ""
-	if errSurveyID != nil {
-		//set return
-		errReturn = "The HTTP request for getting SurveyID failed with error: " + errSurveyID.Error()
-		//activityLog.Errorf(errReturn)
+	resSurveyID, errReturn = CallRest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil, accessToken)
+	if errReturn != nil {
 		return "", errors.New(errReturn)
 	}
-	resSurveyID, _ := ioutil.ReadAll(resSurveyIDData.Body)
-	//fmt.Println("resSurveyID= ", string(resSurveyID))
+	// request, _ := http.NewRequest("GET", "https://api.surveymonkey.com/v3/surveys?title="+surveyName, nil)
+	// request.Header.Set("Authorization", "bearer "+accessToken)
+	// request.Header.Set("Content-Type", "application/json")
+	// client := &http.Client{}
+	// resSurveyIDData, errSurveyID := client.Do(request)
+	// surveyID := ""
+	// if errSurveyID != nil {
+	// 	//set return
+	// 	errReturn = "The HTTP request for getting SurveyID failed with error: " + errSurveyID.Error()
+	// 	//activityLog.Errorf(errReturn)
+	// 	return "", errors.New(errReturn)
+	// }
+	// resSurveyID, _ := ioutil.ReadAll(resSurveyIDData.Body)
+	// //fmt.Println("resSurveyID= ", string(resSurveyID))
 
 	invalidSurveyName := gjson.Get(string(resSurveyID), "data.#").String()
-	errorCode = gjson.Get(string(resSurveyID), "error.http_status_code").String()
-	if errorCode == "401" {
-		//set return
-		errReturn = gjson.Get(string(resSurveyID), "error.message").String()
-		//activityLog.Errorf(errReturn)
-		return "", errors.New(errReturn)
-	} else if errorCode == "404" {
-		//set return
-		errReturn = gjson.Get(string(resSurveyID), "error.message").String()
-		//activityLog.Errorf(errReturn)
-		return "", errors.New(errReturn)
-	} else if invalidSurveyName == "0" {
-		//set return
+	// errorCode = gjson.Get(string(resSurveyID), "error.http_status_code").String()
+	// if errorCode == "401" {
+	// 	//set return
+	// 	errReturn = gjson.Get(string(resSurveyID), "error.message").String()
+	// 	//activityLog.Errorf(errReturn)
+	// 	return "", errors.New(errReturn)
+	// } else if errorCode == "404" {
+	// 	//set return
+	// 	errReturn = gjson.Get(string(resSurveyID), "error.message").String()
+	// 	//activityLog.Errorf(errReturn)
+	// 	return "", errors.New(errReturn)
+	// }
+	if invalidSurveyName == "0" {
 		errReturn = "Invalid Survey name !!"
-		//activityLog.Errorf(errReturn)
 		return "", errors.New(errReturn)
-	} else {
-		surveyID = gjson.Get(string(resSurveyID), "data.0.id").String()
 	}
+	surveyID = gjson.Get(string(resSurveyID), "data.0.id").String()
 	//fmt.Println("resSurveyID", surveyID)
 
-	linkSurveyDetails := "https://api.surveymonkey.com/v3/surveys/" + surveyID + "/details"
-	request, _ = http.NewRequest("GET", linkSurveyDetails, nil)
-	request.Header.Set("Authorization", "bearer "+accessToken)
-	request.Header.Set("Content-Type", "application/json")
-	client = &http.Client{}
-	resSurveyDetails, errSurveyDetails := client.Do(request)
-	if errSurveyDetails != nil {
-		//set return
-		errReturn = "The HTTP request for getting SurveyID failed with error: " + errSurveyDetails.Error()
-		//activityLog.Errorf(errReturn)
+	/*--------------------------------------------------------------------------------------------------*/
+
+	surveyDetails, errReturn = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/details", nil, accessToken)
+	if errReturn != nil {
 		return "", errors.New(errReturn)
 	}
-	surveyDetails, _ := ioutil.ReadAll(resSurveyDetails.Body)
-	//fmt.Println(string(surveyDetails))
-	errorCode = gjson.Get(string(surveyDetails), "error.http_status_code").String()
-	if errorCode == "404" {
-		//set return
-		errReturn = gjson.Get(string(surveyDetails), "error.message").String()
-		//activityLog.Errorf(errReturn)
-		return "", errors.New(errReturn)
-	}
+	// linkSurveyDetails := "https://api.surveymonkey.com/v3/surveys/" + surveyID + "/details"
+	// request, _ = http.NewRequest("GET", linkSurveyDetails, nil)
+	// request.Header.Set("Authorization", "bearer "+accessToken)
+	// request.Header.Set("Content-Type", "application/json")
+	// client = &http.Client{}
+	// resSurveyDetails, errSurveyDetails := client.Do(request)
+	// if errSurveyDetails != nil {
+	// 	//set return
+	// 	errReturn = "The HTTP request for getting SurveyID failed with error: " + errSurveyDetails.Error()
+	// 	//activityLog.Errorf(errReturn)
+	// 	return "", errors.New(errReturn)
+	// }
+	// surveyDetails, _ := ioutil.ReadAll(resSurveyDetails.Body)
+	// //fmt.Println(string(surveyDetails))
+	// errorCode = gjson.Get(string(surveyDetails), "error.http_status_code").String()
+	// if errorCode == "404" {
+	// 	//set return
+	// 	errReturn = gjson.Get(string(surveyDetails), "error.message").String()
+	// 	//activityLog.Errorf(errReturn)
+	// 	return "", errors.New(errReturn)
+	// }
 	//set surveyDetails parent element
 	jsonstr = `{ "surveydetails" : ` + string(surveyDetails) + `}`
 
-	linkSurveyResponse := "https://api.surveymonkey.com/v3/surveys/" + surveyID + "/responses/bulk"
-	request, _ = http.NewRequest("GET", linkSurveyResponse, nil)
-	request.Header.Set("Authorization", "bearer "+accessToken)
-	request.Header.Set("Content-Type", "application/json")
-	client = &http.Client{}
-	resSurveyResponse, errSurveyResponse := client.Do(request)
-	if errSurveyResponse != nil {
-		//set return
-		errReturn = "The HTTP request for getting SurveyID failed with error: " + errSurveyResponse.Error()
-		//activityLog.Errorf(errReturn)
+	/*--------------------------------------------------------------------------------------------------*/
+
+	surveyResponse, errReturn = CallRest("GET", "https://api.surveymonkey.com/v3/surveys/"+surveyID+"/responses/bulk", nil, accessToken)
+	if errReturn != nil {
 		return "", errors.New(errReturn)
 	}
-	surveyResponse, _ := ioutil.ReadAll(resSurveyResponse.Body)
-	//fmt.Println(string(surveyResponse))
-	errorCode = gjson.Get(string(surveyResponse), "error.http_status_code").String()
-	if errorCode == "404" {
-		//set return
-		errReturn = gjson.Get(string(surveyResponse), "error.message").String()
-		//activityLog.Errorf(errReturn)
-		return "", errors.New(errReturn)
-	}
+	// linkSurveyResponse := "https://api.surveymonkey.com/v3/surveys/" + surveyID + "/responses/bulk"
+	// request, _ = http.NewRequest("GET", linkSurveyResponse, nil)
+	// request.Header.Set("Authorization", "bearer "+accessToken)
+	// request.Header.Set("Content-Type", "application/json")
+	// client = &http.Client{}
+	// resSurveyResponse, errSurveyResponse := client.Do(request)
+	// if errSurveyResponse != nil {
+	// 	//set return
+	// 	errReturn = "The HTTP request for getting SurveyID failed with error: " + errSurveyResponse.Error()
+	// 	//activityLog.Errorf(errReturn)
+	// 	return "", errors.New(errReturn)
+	// }
+	// surveyResponse, _ := ioutil.ReadAll(resSurveyResponse.Body)
+	// //fmt.Println(string(surveyResponse))
+	// errorCode = gjson.Get(string(surveyResponse), "error.http_status_code").String()
+	// if errorCode == "404" {
+	// 	//set return
+	// 	errReturn = gjson.Get(string(surveyResponse), "error.message").String()
+	// 	//activityLog.Errorf(errReturn)
+	// 	return "", errors.New(errReturn)
+	// }
 	//set surveyresponses
 	jsonSR = `{ "surveyresponses" : ` + string(surveyResponse) + `}`
+
+	/*--------------------------------------------------------------------------------------------------*/
 
 	questions := gjson.Get(jsonstr, "surveydetails.pages.0.questions")
 	for _, que := range questions.Array() {

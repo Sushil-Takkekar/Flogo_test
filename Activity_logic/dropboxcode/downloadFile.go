@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // // Downloaderror is the struct for download error
@@ -23,13 +24,17 @@ func DownloadFile(accessToken string, DropboxAPIArg string) (result []byte, err 
 	request, _ := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/download", nil)
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	request.Header.Set("Dropbox-API-Arg", DropboxAPIArg)
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 30,
+	}
 	resDownloadFile, errDownloadFile := client.Do(request)
 	if errDownloadFile != nil {
 		//fmt.Printf(errDownloadFile.Error())
 		//activityLog.Errorf(errDownloadFile.Error())
 		return res, errDownloadFile
 	}
+	// Close http connection
+	defer resDownloadFile.Body.Close()
 	resDownloadFileData, _ := ioutil.ReadAll(resDownloadFile.Body)
 	if strings.Contains(string(resDownloadFileData), "Error in call to API function") {
 		//fmt.Println("Error= ", string(resDownloadFileData))

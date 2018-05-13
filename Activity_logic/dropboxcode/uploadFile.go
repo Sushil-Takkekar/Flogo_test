@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const (
@@ -41,13 +42,17 @@ func UploadFile(accessToken string, sourceType string, DropboxAPIArg string, sou
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	request.Header.Set("Content-Type", "application/octet-stream")
 	request.Header.Set("Dropbox-API-Arg", DropboxAPIArg)
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 30,
+	}
 	resUploadFile, errUploadFile := client.Do(request)
 	if errUploadFile != nil {
 		//fmt.Printf(errUploadFile.Error())
 		//activityLog.Errorf(errUploadFile.Error())
 		return res, errUploadFile
 	}
+	// Close http connection
+	defer resUploadFile.Body.Close()
 	resUploadFileData, _ := ioutil.ReadAll(resUploadFile.Body)
 	if strings.Contains(string(resUploadFileData), "Error in call to API function") {
 		//fmt.Println("Error= ", string(resUploadFileData))

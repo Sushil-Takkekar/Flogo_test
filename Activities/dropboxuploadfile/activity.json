@@ -31,8 +31,8 @@
       "type": "string"
     },
     {
-      "name": "binaryContent",
-      "type": "any"
+      "name": "fileContent",
+      "type": "string"
     }
   ],
   "outputs": [

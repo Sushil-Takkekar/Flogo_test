@@ -56,7 +56,7 @@ func TestEval(t *testing.T) {
 	tc.SetInput("sourceType", "File path")
 	tc.SetInput("dropboxDestPath", "/Home/TestUpload/myconfig.zip")
 	tc.SetInput("sourceFilePath", "D:/BW6/BW6_Export/FilePoller.zip")
-	//tc.SetInput("fileContent", tmp)
+	//tc.SetInput("binaryContent", tmp)
 	act.Eval(tc)
 	//check result attr
 	result := tc.GetOutput("result")
@@ -73,8 +73,7 @@ func TestEval(t *testing.T) {
 	if errBinaryData != nil {
 		fmt.Println(errBinaryData.Error())
 	}
-	fileContent := string(binaryData)
-	tc.SetInput("fileContent", fileContent)
+	tc.SetInput("binaryContent", binaryData)
 	act.Eval(tc)
 	//check result attr
 	result2 := tc.GetOutput("result")

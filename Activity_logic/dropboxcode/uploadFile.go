@@ -20,7 +20,7 @@ type Downloaderror struct {
 	ErrorSummary string
 }
 
-func UploadFile(accessToken string, sourceType string, DropboxAPIArg string, sourceFilePath string, fileContent string) (result []byte, err error) {
+func UploadFile(accessToken string, sourceType string, DropboxAPIArg string, sourceFilePath string, binaryContent []byte) (result []byte, err error) {
 	// Get source file contents
 	var srcFile, res []byte
 	var errReadFile error
@@ -34,7 +34,7 @@ func UploadFile(accessToken string, sourceType string, DropboxAPIArg string, sou
 		}
 
 	case srcBinaryContent:
-		srcFile = []byte(fileContent)
+		srcFile = binaryContent
 	}
 
 	// Make api call for upload
